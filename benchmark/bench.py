@@ -400,7 +400,7 @@ def main():
 
     args = parser.parse_args()
 
-    disabled_libraries = ["nujson", "simplejson", "json"]
+    disabled_libraries = ["nujson", "simplejson"]
     enabled_libraries = {}
     for libname in known_libraries:
         if libname not in disabled_libraries:
