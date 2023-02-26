@@ -1,0 +1,4 @@
+build/
+.pytest_cache/
+*.egg-info
+compile_flags.txt
