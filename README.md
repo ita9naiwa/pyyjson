@@ -1,18 +1,10 @@
-![PyPI - License](https://img.shields.io/pypi/l/yyjson.svg?style=flat-square)
-![Tests](https://github.com/TkTech/py_yyjson/workflows/Run%20tests/badge.svg)
-
-# py_yyjson
-
-Python bindings for the excellent [yyjson][] project.
-
-## Documentation
-
-[yyjson]: https://github.com/ibireme/yyjson
-[py_yyjson]: http://github.com/TkTech/py_yyjson
+# pyyjson
 
 Yet another Json Parser for Python
 - based on yyjson bindings from @TkTech([yyjson](https://github.com/ibireme/yyjson))
 - benchmarks are based on [ultrajson](https://github.com/ultrajson/ultrajson)
+- original c library: [yyjson]: https://github.com/ibireme/yyjson
+
 
 ### Supports
 it supports standard libraries
