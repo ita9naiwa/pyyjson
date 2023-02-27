@@ -13,10 +13,10 @@ static inline yyjson_mut_val*
 mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj);
 
 static PyObject *
-loads(PyObject *self, PyObject *args, PyObject *kwargs);
+loads(PyObject *self, PyObject *args);
 
 static PyObject *
-dumps(PyObject *self, PyObject *args, PyObject *kwargs);
+dumps(PyObject *self, PyObject *args);
 
 static inline PyObject *
 yyjson_val_to_py_obj(yyjson_val * val)
@@ -161,19 +161,12 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
 }
 
 static PyObject *
-loads(PyObject *self, PyObject *args, PyObject *kwargs) {
-    static char *kwlist[] = {"path", "flags", NULL};
+loads(PyObject *self, PyObject *args) {
     PyObject *content_py;
     yyjson_read_err err;
     yyjson_read_flag r_flag = 0;
 
-    if(!PyArg_ParseTupleAndKeywords(
-        args, kwargs,
-        "U|I",
-        kwlist,
-        &content_py,
-        &r_flag
-    )) {
+    if(!PyArg_ParseTuple(args, "UI", &content_py, &r_flag)) {
         PyErr_SetString(PyExc_TypeError, "Args Parse Error");
         return Py_None;
     }
@@ -224,22 +217,16 @@ load(PyObject *self, PyObject *args, PyObject *kwargs) {
     }
     yyjson_val *root = yyjson_doc_get_root(val);
     PyObject *ret = yyjson_val_to_py_obj(root);
+    yyjson_doc_free(val);
     return ret;
 }
 
 static PyObject *
-dumps(PyObject *self, PyObject *args, PyObject *kwargs) {
-    static char *kwlist[] = {"object", "flags", NULL};
+dumps(PyObject *self, PyObject *args) {
     PyObject *obj;
     yyjson_read_flag w_flag = 0;
 
-    if(!PyArg_ParseTupleAndKeywords(
-        args, kwargs,
-        "O|I",
-        kwlist,
-        &obj,
-        &w_flag
-    )) {
+    if(!PyArg_ParseTuple(args, "OI", &obj, &w_flag)) {
         PyErr_SetString(PyExc_TypeError, "Args Parse Error");
         return Py_None;
     }
@@ -249,8 +236,10 @@ dumps(PyObject *self, PyObject *args, PyObject *kwargs) {
     char* result = NULL;
     size_t w_len;
     yyjson_write_err w_err;
-    result = yyjson_mut_val_write_opts(root, w_flag, &PyMem_Allocator, &w_len, &w_err);
 
+    result = yyjson_mut_val_write_opts(root, w_flag, &PyMem_Allocator, &w_len, &w_err);
     PyObject *obj_ret = PyUnicode_FromStringAndSize(result, w_len);
+    PyMem_Allocator.free(NULL, result);
+    yyjson_mut_doc_free(new_doc);
     return obj_ret;
 }

@@ -6,8 +6,8 @@
 
 static PyMethodDef yymethods[] = {
     {"_load", load, METH_VARARGS | METH_KEYWORDS, "json load"},
-    {"_loads", loads, METH_VARARGS | METH_KEYWORDS, "json loads"},
-    {"_dumps", dumps, METH_VARARGS | METH_KEYWORDS, "json dumps"},
+    {"_loads", loads, METH_VARARGS, "json loads"},
+    {"_dumps", dumps, METH_VARARGS, "json dumps"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 

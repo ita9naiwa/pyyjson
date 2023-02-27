@@ -58,7 +58,7 @@ def dumps(obj, ensure_ascii=False, escape_slash=False, flags=0x00):
     if escape_slash:
         _flags |= WriterFlags.ESCAPE_SLASHES
     _flags |= flags
-    return _dumps(obj, _flags)
+    return _dumps(obj, flags)
 
 def dump(obj, fp, ensure_ascii=False, escape_slash=False, flags=0x00):
     _flags = 0x00
