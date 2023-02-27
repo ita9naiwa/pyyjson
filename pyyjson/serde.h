@@ -193,6 +193,7 @@ loads(PyObject *self, PyObject *args) {
     }
     yyjson_val *root = yyjson_doc_get_root(val);
     PyObject *ret = yyjson_val_to_py_obj(root);
+    yyjson_doc_free(val);
     return ret;
 }
 

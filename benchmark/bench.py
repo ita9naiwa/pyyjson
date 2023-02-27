@@ -220,7 +220,7 @@ def loads_with_ujson():
 
 @register_benchmark("pyyjson", _testname)
 def loads_with_pyyjson():
-    pyyjson._loads(decode_data, 0)
+    pyyjson.loads(decode_data)
 
 @register_benchmark("yyjson", _testname)
 def loads_with_yyjson():
@@ -384,8 +384,8 @@ def main():
     )
 
     known_libraries = [
-        "pyyjson",
         "yyjson",
+        "pyyjson",
         "ujson",
         "nujson",
         "orjson",
@@ -410,7 +410,7 @@ def main():
 
     args = parser.parse_args()
 
-    disabled_libraries = ["json", "orjson", "ujson"]
+    disabled_libraries = ["simplejson", "nujson", "orjson", "json", "ujson"]
     enabled_libraries = {}
     for libname in known_libraries:
         if libname not in disabled_libraries:

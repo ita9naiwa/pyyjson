@@ -1,5 +1,5 @@
 import enum
-from serde import _loads, _dumps
+from pyyjson.cserde import _loads, _dumps
 import os
 
 class ReaderFlags(enum.IntFlag):

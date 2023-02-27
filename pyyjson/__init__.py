@@ -7,5 +7,5 @@ __all__ = [
     'WriterFlags'
 ]
 
-from .pyyjson import load, loads, dump, dumps
-from .pyyjson import ReaderFlags, WriterFlags
+from .wrapper import load, loads, dump, dumps
+from .wrapper import ReaderFlags, WriterFlags

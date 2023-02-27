@@ -33,7 +33,7 @@ setup(
     },
     ext_modules=[
         Extension(
-            'serde',
+            'pyyjson.cserde',
             [
                 'pyyjson/binding.c',
                 'pyyjson/memory.c',

@@ -34,11 +34,11 @@ each elements in cols denotes "calls/sec". Test suite is adapted from ujson's be
 
 |         content         |        |  json | ujson | orjson | pyyjson(mine) |
 |:-----------------------:|:------:|:-----:|:-----:|:------:|:-------------:|
-|    Arr of 256 doubles   | ENCODE |  6201 | 27092 | 118710 |     67580     |
-|    Arr of 256 dobules   | DECODE | 16252 | 38300 | 111293 |     73448     |
-| Arr of 256 UTF-8 string | ENCODE |  3670 |  7516 |  33068 |      3815     |
-| Arr of 256 UTF-8 String | DECODE |  2211 |  1636 |  4369  |      3162     |
-|    Arr of 256 strings   | ENCODE | 28677 | 49102 | 171134 |     51165     |
-|    Arr of 256 strings   | DECODE | 46222 | 30076 |  87968 |     50892     |
-|  Medium complex object  | ENCODE |  8171 | 14272 |  63878 |     27021     |
-|  Medium complex object  | DECODE | 16055 | 11789 |  32374 |     15795     |
+|    Arr of 256 doubles   | ENCODE |  10119 | 35361 | 170829 |124386        |
+|    Arr of 256 dobules   | DECODE | 28684 | 54593 | 170383 |     122328    |
+| Arr of 256 UTF-8 string | ENCODE |  5247 |  7344 |  45684 |      8797     |
+| Arr of 256 UTF-8 String | DECODE |  2838 |  5223 |  7248  |      5516     |
+|    Arr of 256 strings   | ENCODE | 36624 | 59568 | 216707 |     136944     |
+|    Arr of 256 strings   | DECODE | 66842 | 66960 |  100252 |     105645     |
+|  Medium complex object  | ENCODE |  9948 | 22344 |  80465 |     56106     |
+|  Medium complex object  | DECODE | 17183 | 28733 |  45008 |     26377     |
