@@ -9,7 +9,7 @@ import sys
 import timeit
 from collections import defaultdict
 
-import ujson
+import ujson, yyjson
 
 # Will be set by "main" if user requests them
 simplejson = None
@@ -183,6 +183,11 @@ def dumps_with_ujson():
 def dumps_with_pyyjson():
     pyyjson.dumps(test_object)
 
+
+@register_benchmark("yyjson", _testname)
+def dumps_with_yyjson():
+    yyjson.Document(test_object).dumps()
+
 # =============================================================================
 # JSON decoding.
 # =============================================================================
@@ -216,6 +221,10 @@ def loads_with_ujson():
 @register_benchmark("pyyjson", _testname)
 def loads_with_pyyjson():
     pyyjson.loads(decode_data)
+
+@register_benchmark("yyjson", _testname)
+def loads_with_yyjson():
+    yyjson.Document(decode_data).as_obj
 
 # =============================================================================
 # Benchmarks.
@@ -376,6 +385,7 @@ def main():
 
     known_libraries = [
         "pyyjson",
+        "yyjson",
         "ujson",
         "nujson",
         "orjson",
@@ -400,7 +410,7 @@ def main():
 
     args = parser.parse_args()
 
-    disabled_libraries = ["nujson", "simplejson"]
+    disabled_libraries = ["json", "orjson", "ujson", "nujson", "simplejson"]
     enabled_libraries = {}
     for libname in known_libraries:
         if libname not in disabled_libraries:

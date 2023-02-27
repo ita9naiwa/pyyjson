@@ -33,7 +33,7 @@ setup(
     },
     ext_modules=[
         Extension(
-            'cyyjson',
+            'serde',
             [
                 'pyyjson/binding.c',
                 'pyyjson/memory.c',

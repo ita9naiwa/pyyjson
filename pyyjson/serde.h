@@ -230,7 +230,6 @@ load(PyObject *self, PyObject *args, PyObject *kwargs) {
 static PyObject *
 dumps(PyObject *self, PyObject *args, PyObject *kwargs) {
     static char *kwlist[] = {"object", "flags", NULL};
-    yyjson_read_err err;
     PyObject *obj;
     yyjson_read_flag w_flag = 0;
 

@@ -13,14 +13,14 @@ static PyMethodDef yymethods[] = {
 
 static PyModuleDef yymodule = {
     PyModuleDef_HEAD_INIT,
-    "cyyjson",
+    "serde",
     "Python bindings for the yyjson project.",
     -1,
     yymethods
 };
 
 PyMODINIT_FUNC
-PyInit_cyyjson(void)
+PyInit_serde(void)
 {
     PyObject *m;
     m = PyModule_Create(&yymodule);

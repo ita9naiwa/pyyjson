@@ -1,5 +1,5 @@
 import enum
-from cyyjson import _load, _loads, _dumps
+from serde import _load, _loads, _dumps
 import os
 
 class ReaderFlags(enum.IntFlag):
