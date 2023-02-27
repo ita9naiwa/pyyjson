@@ -1,5 +1,5 @@
 import enum
-from serde import _load, _loads, _dumps
+from serde import _loads, _dumps
 import os
 
 class ReaderFlags(enum.IntFlag):
@@ -46,7 +46,10 @@ def load(path, flags=0x00):
         pass
     else:
         raise FileNotFoundError(f"{path} not found!")
-    return _load(path, flags)
+    with open(path, 'r') as f:
+        txt = f.read()
+
+    return loads(txt, flags)
 
 def loads(doc, flags=0x00):
     return _loads(doc, flags)

@@ -166,12 +166,20 @@ loads(PyObject *self, PyObject *args) {
     yyjson_read_err err;
     yyjson_read_flag r_flag = 0;
 
-    if(!PyArg_ParseTuple(args, "UI", &content_py, &r_flag)) {
+    if(!PyArg_ParseTuple(args, "OI", &content_py, &r_flag)) {
         PyErr_SetString(PyExc_TypeError, "Args Parse Error");
         return Py_None;
     }
     Py_ssize_t str_len;
-    const char *content = PyUnicode_AsUTF8AndSize(content_py, &str_len);
+    const char *content;
+    if (PyUnicode_Check(content_py))
+        content = PyUnicode_AsUTF8AndSize(content_py, &str_len);
+    else if (PyBytes_Check(content_py))
+        PyBytes_AsStringAndSize(content_py, (char**) &content, &str_len);
+    else {
+        PyErr_SetString(PyExc_ValueError, "Either Bytes or String should be given");
+        return Py_None;
+    }
     yyjson_doc *val = yyjson_read_opts(
           (char*)content,
           str_len,
@@ -185,39 +193,6 @@ loads(PyObject *self, PyObject *args) {
     }
     yyjson_val *root = yyjson_doc_get_root(val);
     PyObject *ret = yyjson_val_to_py_obj(root);
-    return ret;
-}
-
-static PyObject *
-load(PyObject *self, PyObject *args, PyObject *kwargs) {
-    static char *kwlist[] = {"path", "flags", NULL};
-    char *path;
-    yyjson_read_err err;
-    yyjson_read_flag r_flag = 0;
-
-    if(!PyArg_ParseTupleAndKeywords(
-        args, kwargs,
-        "s|I",
-        kwlist,
-        &path,
-        &r_flag
-    )) {
-        PyErr_SetString(PyExc_TypeError, "Args Parse Error");
-        return Py_None;
-    }
-    yyjson_doc *val = yyjson_read_file(
-          path,
-          r_flag,
-          &PyMem_Allocator,
-          &err
-        );
-    if (!val) {
-        PyErr_SetString(PyExc_ValueError, err.msg);
-        return Py_None;
-    }
-    yyjson_val *root = yyjson_doc_get_root(val);
-    PyObject *ret = yyjson_val_to_py_obj(root);
-    yyjson_doc_free(val);
     return ret;
 }
 
