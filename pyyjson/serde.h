@@ -113,6 +113,11 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
         Py_ssize_t str_len;
         const char *str = PyUnicode_AsUTF8AndSize(obj, &str_len);
         return yyjson_mut_strncpy(doc, str, str_len);
+    } else if (ob_type == &PyBytes_Type) {
+        const char* str;
+        Py_ssize_t str_len;
+        PyBytes_AsStringAndSize(obj, (char**) &str, &str_len);
+        return yyjson_mut_strncpy(doc, str, str_len);
     } else if (ob_type == &PyLong_Type) {
         // ignore just integers larger than 64bits
         int overflow = 0;
