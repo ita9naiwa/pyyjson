@@ -55,7 +55,7 @@ def loads(doc, flags=0x00):
     return _loads(doc, flags)
 
 def __default(x):
-    raise TypeError(f"Not serialzable type {type(x)} are given")
+    return x
 
 
 def dumps(obj, ensure_ascii=False, default=None, escape_slash=False, flags=0x00):
