@@ -162,7 +162,6 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
     } else if (obj == Py_None) {
         return yyjson_mut_null(doc);
     } else {
-        printf("혹~시 얘가 실행되나\n");
         PyObject *str_repr = PyObject_Str(obj);
         Py_ssize_t str_len;
         const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
