@@ -162,23 +162,23 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
     } else if (obj == Py_None) {
         return yyjson_mut_null(doc);
     } else {
-        if (fallback_f != NULL) {
-            PyObject *args = PyTuple_Pack(1, obj);
-            PyObject *new_repr = PyObject_CallObject(fallback_f, args);
-            yyjson_mut_val *val = mut_primitive_to_element(doc, new_repr, NULL);
-            Py_DecRef(args);
-            Py_DecRef(new_repr);
-            return val;
+        if (false) {
+            // PyObject *args = PyTuple_Pack(1, obj);
+            // PyObject *new_repr = PyObject_CallObject(fallback_f, args);
+            // yyjson_mut_val *val = mut_primitive_to_element(doc, new_repr, NULL);
+            // Py_DecRef(args);
+            // Py_DecRef(new_repr);
+            // return val;
         } else {
-            PyErr_SetString(PyExc_TypeError, "Encountered impossible to parsed");
-            return NULL;
+            // PyErr_SetString(PyExc_TypeError, "Encountered impossible to parsed");
+            // return NULL;
             // looped here
             // force fallback to string
-            // PyObject *str_repr = PyObject_Str(obj);
-            // Py_ssize_t str_len;
-            // const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
-            // Py_DecRef(str_repr);
-            // return yyjson_mut_rawncpy(doc, str, str_len);
+            PyObject *str_repr = PyObject_Str(obj);
+            Py_ssize_t str_len;
+            const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
+            Py_DecRef(str_repr);
+            return yyjson_mut_rawncpy(doc, str, str_len);
         }
     }
 }
