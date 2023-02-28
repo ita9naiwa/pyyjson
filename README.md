@@ -1,9 +1,9 @@
 # pyyjson
 
 Yet another Json Parser for Python
-- based on yyjson bindings from @TkTech([yyjson](https://github.com/ibireme/yyjson))
+- based on yyjson bindings from @TkTech's ([py_yyjson](https://github.com/ibireme/yyjson))
+- original c library: [yyjson](https://github.com/ibireme/yyjson)
 - benchmarks are based on [ultrajson](https://github.com/ultrajson/ultrajson)
-- original c library: [yyjson]: https://github.com/ibireme/yyjson
 
 
 ### Supports
