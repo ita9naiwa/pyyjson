@@ -39,3 +39,12 @@ def test5_bytes():
     msg_bytes = {"ita9naiwa": b"blahblah"}
     msg_nobytes = {"ita9naiwa": "blahblah"}
     assert pyyjson.dumps(msg_bytes) == pyyjson.dumps(msg_nobytes)
+
+def test6_time_example():
+    import datetime, time
+    now = datetime.datetime.now()
+    def default_parser1(obj):
+        if isinstance(obj, datetime.datetime):
+            return int(time.mktime(obj.timetuple()))
+        raise TypeError(f"Type {type(obj)} is not serializable")
+    assert True == isinstance(pyyjson.dumps([now], default=default_parser1), int)

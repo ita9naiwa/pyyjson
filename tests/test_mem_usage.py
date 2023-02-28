@@ -10,8 +10,8 @@ str_1 = json.dumps(obj_1)
 str_2 = json.dumps(obj_2)
 
 tracemalloc.start()
-for i in range(1000):
-    # str_1 = pyyjson.dumps(obj_1)
+for i in range(10000):
+    str_1 = pyyjson.dumps(obj_1)
     obj_1 = pyyjson.loads(str_1)
 snapshot = tracemalloc.take_snapshot()
 top_stats = snapshot.statistics('lineno')

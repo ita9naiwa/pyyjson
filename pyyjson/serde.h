@@ -10,7 +10,7 @@ static inline PyObject *
 yyjson_val_to_py_obj(yyjson_val * val);
 
 static inline yyjson_mut_val*
-mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj);
+mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject * fallback_f);
 
 static PyObject *
 loads(PyObject *self, PyObject *args);
@@ -107,7 +107,7 @@ yyjson_val_to_py_obj(yyjson_val * val)
 
 
 static inline yyjson_mut_val*
-mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
+mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_f) {
     const PyTypeObject *ob_type = obj->ob_type;
     if (ob_type == &PyUnicode_Type) {
         Py_ssize_t str_len;
@@ -135,7 +135,7 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
     } else if (ob_type == &PyList_Type) {
         yyjson_mut_val *val = yyjson_mut_arr(doc);
         for (Py_ssize_t i = 0; i < PyList_GET_SIZE(obj); i++) {
-            yyjson_mut_arr_append(val, mut_primitive_to_element(doc, PyList_GET_ITEM(obj, i)));
+            yyjson_mut_arr_append(val, mut_primitive_to_element(doc, PyList_GET_ITEM(obj, i), fallback_f));
         }
         return val;
     } else if (ob_type == &PyDict_Type) {
@@ -148,7 +148,7 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
             Py_ssize_t str_len;
             const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
             yyjson_mut_val *new_key = yyjson_mut_strncpy(doc, str, str_len);
-            yyjson_mut_obj_add(val, new_key, mut_primitive_to_element(doc, v));
+            yyjson_mut_obj_add(val, new_key, mut_primitive_to_element(doc, v, fallback_f));
         }
         return val;
     } else if (ob_type == &PyFloat_Type) {
@@ -162,10 +162,22 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
     } else if (obj == Py_None) {
         return yyjson_mut_null(doc);
     } else {
-        PyObject *str_repr = PyObject_Str(obj);
-        Py_ssize_t str_len;
-        const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
-        return yyjson_mut_rawncpy(doc, str, str_len);
+        if (fallback_f != NULL) {
+            PyObject *args = PyTuple_Pack(1, obj);
+            PyObject *new_repr = PyObject_CallObject(fallback_f, args);
+            yyjson_mut_val *val = mut_primitive_to_element(doc, new_repr, NULL);
+            Py_DecRef(args);
+            Py_DecRef(new_repr);
+            return val;
+        } else {
+            // looped here
+            // force fallback to string
+            PyObject *str_repr = PyObject_Str(obj);
+            Py_ssize_t str_len;
+            const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
+            Py_DecRef(str_repr);
+            return yyjson_mut_rawncpy(doc, str, str_len);
+        }
     }
 }
 
@@ -209,14 +221,15 @@ loads(PyObject *self, PyObject *args) {
 static PyObject *
 dumps(PyObject *self, PyObject *args) {
     PyObject *obj;
+    PyObject *fallback_f;
     yyjson_read_flag w_flag = 0;
 
-    if(!PyArg_ParseTuple(args, "OI", &obj, &w_flag)) {
+    if(!PyArg_ParseTuple(args, "OOI", &obj, &fallback_f, &w_flag)) {
         PyErr_SetString(PyExc_TypeError, "Args Parse Error");
         return Py_None;
     }
     yyjson_mut_doc *new_doc = yyjson_mut_doc_new(&PyMem_Allocator);
-    yyjson_mut_val *root = mut_primitive_to_element(new_doc, obj);
+    yyjson_mut_val *root = mut_primitive_to_element(new_doc, obj, fallback_f);
     yyjson_mut_doc_set_root(new_doc, root);
     char* result = NULL;
     size_t w_len;

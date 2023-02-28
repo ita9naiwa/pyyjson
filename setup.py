@@ -11,7 +11,7 @@ with open(os.path.join(root, 'README.md'), 'rb') as readme:
 setup(
     name='pyyjson',
     packages=find_packages(),
-    version='0.1.0',
+    version='0.1.2',
     description='yet another json libs using yyjson',
     long_description=long_description,
     long_description_content_type='text/markdown',

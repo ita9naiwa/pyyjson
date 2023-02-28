@@ -54,21 +54,29 @@ def load(path, flags=0x00):
 def loads(doc, flags=0x00):
     return _loads(doc, flags)
 
-def dumps(obj, ensure_ascii=False, escape_slash=False, flags=0x00):
-    _flags = 0x00
-    if ensure_ascii:
-        _flags |= WriterFlags.ESCAPE_UNICODE
-    if escape_slash:
-        _flags |= WriterFlags.ESCAPE_SLASHES
-    _flags |= flags
-    return _dumps(obj, flags)
+def __default(x):
+    raise TypeError(f"Not serialzable type {type(x)} are given")
 
-def dump(obj, fp, ensure_ascii=False, escape_slash=False, flags=0x00):
+
+def dumps(obj, ensure_ascii=False, default=None, escape_slash=False, flags=0x00):
     _flags = 0x00
     if ensure_ascii:
         _flags |= WriterFlags.ESCAPE_UNICODE
     if escape_slash:
         _flags |= WriterFlags.ESCAPE_SLASHES
     _flags |= flags
-    ret_str = _dumps(obj, _flags)
+    if default == None:
+        default = __default
+
+    return _dumps(obj, default, flags)
+
+def dump(obj, fp, ensure_ascii=False, default=None, escape_slash=False, flags=0x00):
+    _flags = 0x00
+    if ensure_ascii:
+        _flags |= WriterFlags.ESCAPE_UNICODE
+    if escape_slash:
+        _flags |= WriterFlags.ESCAPE_SLASHES
+    _flags |= flags
+    ret_str = _dumps(obj, ensure_ascii=ensure_ascii, default=default, escape_slash=escape_slash, flags=_flags)
+
     return fp.write(ret_str)
