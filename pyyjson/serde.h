@@ -170,13 +170,15 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
             Py_DecRef(new_repr);
             return val;
         } else {
+            PyErr_SetString(PyExc_TypeError, "Encountered impossible to parsed");
+            return NULL;
             // looped here
             // force fallback to string
-            PyObject *str_repr = PyObject_Str(obj);
-            Py_ssize_t str_len;
-            const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
-            Py_DecRef(str_repr);
-            return yyjson_mut_rawncpy(doc, str, str_len);
+            // PyObject *str_repr = PyObject_Str(obj);
+            // Py_ssize_t str_len;
+            // const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
+            // Py_DecRef(str_repr);
+            // return yyjson_mut_rawncpy(doc, str, str_len);
         }
     }
 }

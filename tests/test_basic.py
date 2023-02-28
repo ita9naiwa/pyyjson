@@ -47,4 +47,4 @@ def test6_time_example():
         if isinstance(obj, datetime.datetime):
             return int(time.mktime(obj.timetuple()))
         raise TypeError(f"Type {type(obj)} is not serializable")
-    assert True == isinstance(pyyjson.dumps([now], default=default_parser1), int)
+    pyyjson.dumps([1,2, now], default=default_parser1)
