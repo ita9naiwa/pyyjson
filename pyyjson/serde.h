@@ -114,9 +114,11 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
         const char *str = PyUnicode_AsUTF8AndSize(obj, &str_len);
         return yyjson_mut_strncpy(doc, str, str_len);
     } else if (ob_type == &PyBytes_Type) {
-        const char* str;
+        const char *errors;
         Py_ssize_t str_len;
-        PyBytes_AsStringAndSize(obj, (char**) &str, &str_len);
+        PyObject *new_obj = PyCodec_Decode(obj, "utf-8", errors);
+        const char *str = PyUnicode_AsUTF8AndSize(new_obj, &str_len);
+        Py_DecRef(new_obj);
         return yyjson_mut_strncpy(doc, str, str_len);
     } else if (ob_type == &PyLong_Type) {
         // ignore just integers larger than 64bits
@@ -160,6 +162,7 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj) {
     } else if (obj == Py_None) {
         return yyjson_mut_null(doc);
     } else {
+        printf("혹~시 얘가 실행되나\n");
         PyObject *str_repr = PyObject_Str(obj);
         Py_ssize_t str_len;
         const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
