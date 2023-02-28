@@ -34,3 +34,8 @@ def test4_unicode_json_compatibility():
         assert json.loads(d) == pyyjson.loads(d)
         d = pyyjson.dumps(msg, ensure_ascii=ensure_ascii)
         assert json.loads(d) == pyyjson.loads(d)
+
+def test5_bytes():
+    msg_bytes = {"ita9naiwa": b"blahblah"}
+    msg_nobytes = {"ita9naiwa": "blahblah"}
+    assert pyyjson.dumps(msg_bytes) == pyyjson.dumps(msg_nobytes)
