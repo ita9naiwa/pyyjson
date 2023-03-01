@@ -1,6 +1,7 @@
 import enum
 from pyyjson.cserde import _loads, _dumps
 import os
+import io
 
 class ReaderFlags(enum.IntFlag):
     """
@@ -41,14 +42,18 @@ class WriterFlags(enum.IntFlag):
     INF_AND_NAN_AS_NULL = 0x10
 
 
-def load(path, flags=0x00):
-    if os.path.exists(path):
-        pass
+def load(path, flags=0x00, encoding="utf-8"):
+    if type(path) == io.TextIOWrapper:
+        return loads(path.read(), flags)
+    elif type(path) == str:
+        if os.path.exists(path):
+            pass
+        else:
+            raise FileNotFoundError(f"{path} not found!")
+        with open(path, 'r', encoding) as f:
+            txt = f.read()
     else:
-        raise FileNotFoundError(f"{path} not found!")
-    with open(path, 'r') as f:
-        txt = f.read()
-
+        raise TypeError(f"Unsupported type: {type(path)}")
     return loads(txt, flags)
 
 def loads(doc, flags=0x00):
