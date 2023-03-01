@@ -5,6 +5,19 @@ Yet another Json Parser for Python
 - original c library: [yyjson](https://github.com/ibireme/yyjson)
 - benchmarks are based on [ultrajson](https://github.com/ultrajson/ultrajson)
 
+### Installation
+
+1. installation from pypi
+```
+    pip install pyyjson
+```
+
+2. installation from source
+```
+    git clone https://github.com/ita9naiwa/pyyjson
+    cd pyyjson
+    pip install .
+```
 
 ### Supports
 it supports standard `json` lib's
