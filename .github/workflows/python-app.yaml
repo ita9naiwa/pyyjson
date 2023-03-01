@@ -1,0 +1,50 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Build
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    - name: installation
+      run: |
+        pip install flake8;
+        flake8 ./ --filename='*.py' --ignore=E402,E501,E731,E741 --exclude=__init__.py,setup.py,build/,tests/,benchmark/
+
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        cibw-arch: [auto, aarch64]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: source
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: installation
+        run: |
+          cd source;
+          pip install pytest
+          pip install .;
+          cd tests;
+          pytest ./
+          # -1
