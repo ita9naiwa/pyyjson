@@ -37,7 +37,7 @@ def test3_load_bytes_and_strs():
 
 def test4_unicode_json_compatibility():
     for ensure_ascii in [False, True]:
-        msg = {"김밥":"이는고양이", "오뎅": ["그러면", "누가", "멍멍이지?"]}
+        msg = {"김밥": "이는고양이", "오뎅": ["그러면", "누가", "멍멍이지?"]}
         d = json.dumps(msg, ensure_ascii=ensure_ascii)
         assert json.loads(d) == pyyjson.loads(d)
         d = pyyjson.dumps(msg, ensure_ascii=ensure_ascii)

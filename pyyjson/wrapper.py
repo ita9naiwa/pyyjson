@@ -1,7 +1,7 @@
 import enum
 from pyyjson.cserde import _loads, _dumps
 from inspect import signature
-import os
+
 
 class ReaderFlags(enum.IntFlag):
     """
@@ -42,13 +42,14 @@ class WriterFlags(enum.IntFlag):
     INF_AND_NAN_AS_NULL = 0x10
 
 
-
 def loads(doc, flags=0x00):
     return _loads(doc, flags)
+
 
 def load(fp, flags=0x00):
     txt = fp.read()
     return loads(txt, flags)
+
 
 def __default(x):
     return x
@@ -61,7 +62,7 @@ def dumps(obj, ensure_ascii=False, default=None, escape_slash=False, flags=0x00)
     if escape_slash:
         _flags |= WriterFlags.ESCAPE_SLASHES
     _flags |= flags
-    if default == None:
+    if default is None:
         default = __default
     else:
         if not callable(default):
@@ -71,6 +72,7 @@ def dumps(obj, ensure_ascii=False, default=None, escape_slash=False, flags=0x00)
             raise TypeError("default function must have a single parameter")
     return _dumps(obj, default, flags)
 
+
 def dump(obj, fp, ensure_ascii=False, default=None, escape_slash=False, flags=0x00):
-    ret_str = _dumps(obj, ensure_ascii=ensure_ascii, default=default, escape_slash=escape_slash, flags=_flags)
+    ret_str = _dumps(obj, ensure_ascii=ensure_ascii, default=default, escape_slash=escape_slash, flags=flags)
     return fp.write(ret_str)
