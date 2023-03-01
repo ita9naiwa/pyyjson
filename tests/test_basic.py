@@ -2,11 +2,19 @@ import pytest
 import json, pyyjson
 
 obj_1 = [[{a:10 * ["AKGAKEKAKCASKC", "ASDKAEKAC", 1341341] for (i, a) in
-         enumerate("abcdefghijklfaksdfjasejfasjiccabsbkq")}]]
+           enumerate("abcdefghijklfaksdfjasejfasjiccabsbkq")}]]
 obj_2 = {"text": [[{str(a):a*a for a in range(1000)}] for _ in range(13)]}
 
 str_1 = json.dumps(obj_1)
 str_2 = json.dumps(obj_2)
+
+def test0_basic_load_dump():
+    for obj in [obj_1, obj_2]:
+        with open("/tmp/test_pyyjson.json", 'w') as f:
+            json.dump(obj, f)
+        with open("/tmp/test_pyyjson.json", 'r') as f:
+            ret = json.load(f)
+        assert ret == obj
 
 def test1_basic_loads():
     assert json.loads(str_1) == pyyjson.loads(str_1)
@@ -40,7 +48,7 @@ def test5_bytes():
     msg_nobytes = {"ita9naiwa": "blahblah"}
     assert pyyjson.dumps(msg_bytes) == pyyjson.dumps(msg_nobytes)
 
-def test6_time_example():
+def test6_default_example():
     import datetime, time
     now = datetime.datetime.now()
     def default_parser1(obj):
@@ -48,3 +56,12 @@ def test6_time_example():
             return int(time.mktime(obj.timetuple()))
         raise TypeError(f"Type {type(obj)} is not serializable")
     pyyjson.dumps([1,2, now], default=default_parser1)
+
+def test7_default_more():
+    def default_f(x, y):
+        return x
+    with pytest.raises(TypeError):
+        pyyjson.dumps(obj_1, default=default_f)
+    not_callable_default = "it is not a function"
+    with pytest.raises(TypeError):
+        pyyjson.dumps(obj_1, default=not_callable_default)

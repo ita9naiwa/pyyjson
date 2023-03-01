@@ -181,7 +181,9 @@ def dumps_with_ujson():
 
 @register_benchmark("pyyjson", _testname)
 def dumps_with_pyyjson():
-    pyyjson.dumps(test_object)
+    def tmp(y):
+        return y
+    pyyjson.dumps(test_object, default=tmp)
 
 
 @register_benchmark("yyjson", _testname)
@@ -410,7 +412,7 @@ def main():
 
     args = parser.parse_args()
 
-    disabled_libraries = ["simplejson", "nujson", "orjson", "json", "ujson"]
+    disabled_libraries = ["simplejson", "nujson", "orjson", "json",]
     enabled_libraries = {}
     for libname in known_libraries:
         if libname not in disabled_libraries:

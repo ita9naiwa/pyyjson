@@ -10,7 +10,7 @@ static inline PyObject *
 yyjson_val_to_py_obj(yyjson_val * val);
 
 static inline yyjson_mut_val*
-mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject * fallback_f);
+py_obj_to_yyjson_mut_val(yyjson_mut_doc *doc, PyObject *obj, PyObject * fallback_f);
 
 static PyObject *
 loads(PyObject *self, PyObject *args);
@@ -22,7 +22,6 @@ static inline PyObject *
 yyjson_val_to_py_obj(yyjson_val * val)
 {
     yyjson_type type = yyjson_get_type(val);
-
     switch (type) {
         case YYJSON_TYPE_NULL:
             Py_RETURN_NONE;
@@ -52,15 +51,13 @@ yyjson_val_to_py_obj(yyjson_val * val)
                 return NULL;
             yyjson_val *obj_val;
             PyObject *py_val;
-
             yyjson_arr_iter iter = {0};
             yyjson_arr_iter_init(val, &iter);
             size_t idx = 0;
             while ((obj_val = yyjson_arr_iter_next(&iter))) {
                 py_val = yyjson_val_to_py_obj(obj_val);
-                if (!py_val) {
+                if (!py_val)
                     return NULL;
-                }
                 PyList_SET_ITEM(arr, idx++, py_val);
             }
             return arr;
@@ -75,22 +72,18 @@ yyjson_val_to_py_obj(yyjson_val * val)
             yyjson_obj_iter_init(val, &iter);
             while ((obj_key = yyjson_obj_iter_next(&iter))) {
                 obj_val = yyjson_obj_iter_get_val(obj_key);
-                // py_key = yyjson_val_to_py_obj(obj_key);
                 size_t str_len = yyjson_get_len(obj_key);
                 const char *str = yyjson_get_str(obj_key);
                 py_key = PyUnicode_FromStringAndSize(str, str_len);
-                py_val = yyjson_val_to_py_obj(obj_val);
-
-                if (!py_key) {
+                if (!py_key)
                     return NULL;
-                }
+                py_val = yyjson_val_to_py_obj(obj_val);
                 if (!py_val) {
                     Py_DecRef(py_key);  // is it necessary?
                     return NULL;
                 }
-                if(PyDict_SetItem(dict, py_key, py_val) == -1) {
+                if(PyDict_SetItem(dict, py_key, py_val) == -1)
                     return NULL;
-                }
                 Py_DecRef(py_key);
                 Py_DecRef(py_val);
             }
@@ -107,7 +100,7 @@ yyjson_val_to_py_obj(yyjson_val * val)
 
 
 static inline yyjson_mut_val*
-mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_f) {
+py_obj_to_yyjson_mut_val(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_f) {
     const PyTypeObject *ob_type = obj->ob_type;
     if (ob_type == &PyUnicode_Type) {
         Py_ssize_t str_len;
@@ -120,7 +113,7 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
         const char *str = PyUnicode_AsUTF8AndSize(new_obj, &str_len);
         Py_DecRef(new_obj);
         return yyjson_mut_strncpy(doc, str, str_len);
-    } else if (PyObject_IsInstance(obj, &PyLong_Type)) {
+    } else if (PyObject_IsInstance(obj, (PyObject*)&PyLong_Type)) {
         // ignore just integers larger than 64bits
         int overflow = 0;
         const int64_t num = PyLong_AsLongLongAndOverflow(obj, &overflow);
@@ -132,13 +125,13 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
             const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
             return yyjson_mut_rawncpy(doc, str, str_len);
         }
-    } else if (PyObject_IsInstance(obj, &PyList_Type)) {
+    } else if (PyObject_IsInstance(obj, (PyObject*)&PyList_Type)) {
         yyjson_mut_val *val = yyjson_mut_arr(doc);
         for (Py_ssize_t i = 0; i < PyList_GET_SIZE(obj); i++) {
-            yyjson_mut_arr_append(val, mut_primitive_to_element(doc, PyList_GET_ITEM(obj, i), fallback_f));
+            yyjson_mut_arr_append(val, py_obj_to_yyjson_mut_val(doc, PyList_GET_ITEM(obj, i), fallback_f));
         }
         return val;
-    } else if (PyObject_IsInstance(obj, &PyDict_Type)) {
+    } else if (PyObject_IsInstance(obj, (PyObject*)&PyDict_Type)) {
         yyjson_mut_val *val = yyjson_mut_obj(doc);
         Py_ssize_t i = 0;
         PyObject *k, *v;
@@ -148,10 +141,10 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
             Py_ssize_t str_len;
             const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
             yyjson_mut_val *new_key = yyjson_mut_strncpy(doc, str, str_len);
-            yyjson_mut_obj_add(val, new_key, mut_primitive_to_element(doc, v, fallback_f));
+            yyjson_mut_obj_add(val, new_key, py_obj_to_yyjson_mut_val(doc, v, fallback_f));
         }
         return val;
-    } else if (PyObject_IsInstance(obj, &PyFloat_Type)) {
+    } else if (PyObject_IsInstance(obj, (PyObject*)&PyFloat_Type)) {
         double dnum = PyFloat_AsDouble(obj);
         if (dnum == -1 && PyErr_Occurred()) return NULL;
         return yyjson_mut_real(doc, dnum);
@@ -165,7 +158,7 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
         if (fallback_f != NULL) {
             PyObject *args = PyTuple_Pack(1, obj);
             PyObject *new_repr = PyObject_CallObject(fallback_f, args);
-            yyjson_mut_val *val = mut_primitive_to_element(doc, new_repr, NULL);
+            yyjson_mut_val *val = py_obj_to_yyjson_mut_val(doc, new_repr, NULL);
             Py_DecRef(args);
             Py_DecRef(new_repr);
             return val;
@@ -180,7 +173,7 @@ mut_primitive_to_element(yyjson_mut_doc *doc, PyObject *obj, PyObject *fallback_
         }
         PyObject *args = PyTuple_Pack(1, obj);
         PyObject *new_repr = PyObject_CallObject(fallback_f, args);
-        yyjson_mut_val *val = mut_primitive_to_element(doc, new_repr, NULL);
+        yyjson_mut_val *val = py_obj_to_yyjson_mut_val(doc, new_repr, NULL);
         PyObject *str_repr = PyObject_Str(obj);
         Py_ssize_t str_len;
         const char *str = PyUnicode_AsUTF8AndSize(str_repr, &str_len);
@@ -237,7 +230,7 @@ dumps(PyObject *self, PyObject *args) {
         return Py_None;
     }
     yyjson_mut_doc *new_doc = yyjson_mut_doc_new(&PyMem_Allocator);
-    yyjson_mut_val *root = mut_primitive_to_element(new_doc, obj, fallback_f);
+    yyjson_mut_val *root = py_obj_to_yyjson_mut_val(new_doc, obj, fallback_f);
     yyjson_mut_doc_set_root(new_doc, root);
     char* result = NULL;
     size_t w_len;

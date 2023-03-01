@@ -1,5 +1,6 @@
 import enum
 from pyyjson.cserde import _loads, _dumps
+from inspect import signature
 import os
 
 class ReaderFlags(enum.IntFlag):
@@ -41,18 +42,13 @@ class WriterFlags(enum.IntFlag):
     INF_AND_NAN_AS_NULL = 0x10
 
 
-def load(path, flags=0x00):
-    if os.path.exists(path):
-        pass
-    else:
-        raise FileNotFoundError(f"{path} not found!")
-    with open(path, 'r') as f:
-        txt = f.read()
-
-    return loads(txt, flags)
 
 def loads(doc, flags=0x00):
     return _loads(doc, flags)
+
+def load(fp, flags=0x00):
+    txt = fp.read()
+    return loads(txt, flags)
 
 def __default(x):
     return x
@@ -67,16 +63,14 @@ def dumps(obj, ensure_ascii=False, default=None, escape_slash=False, flags=0x00)
     _flags |= flags
     if default == None:
         default = __default
-
+    else:
+        if not callable(default):
+            raise TypeError("default must be a callable object(such as function)")
+        sig = signature(default)
+        if len(sig.parameters) != 1:
+            raise TypeError("default function must have a single parameter")
     return _dumps(obj, default, flags)
 
 def dump(obj, fp, ensure_ascii=False, default=None, escape_slash=False, flags=0x00):
-    _flags = 0x00
-    if ensure_ascii:
-        _flags |= WriterFlags.ESCAPE_UNICODE
-    if escape_slash:
-        _flags |= WriterFlags.ESCAPE_SLASHES
-    _flags |= flags
     ret_str = _dumps(obj, ensure_ascii=ensure_ascii, default=default, escape_slash=escape_slash, flags=_flags)
-
     return fp.write(ret_str)
