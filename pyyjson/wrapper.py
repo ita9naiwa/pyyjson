@@ -1,4 +1,6 @@
 import enum
+import io
+import os
 from pyyjson.cserde import _loads, _dumps
 from inspect import signature
 
@@ -47,7 +49,13 @@ def loads(doc, flags=0x00):
 
 
 def load(fp, flags=0x00):
-    txt = fp.read()
+    if type(fp) == io.TextIOWrapper:
+        txt = fp.read()
+    elif type(fp) == str:
+        if not os.path.exists(fp):
+            raise FileNotFoundError(f"{fp} not found!")
+        with open(fp, 'r') as f:
+            txt = f.read()
     return loads(txt, flags)
 
 
@@ -74,5 +82,12 @@ def dumps(obj, ensure_ascii=False, default=None, escape_slash=False, flags=0x00)
 
 
 def dump(obj, fp, ensure_ascii=False, default=None, escape_slash=False, flags=0x00):
-    ret_str = _dumps(obj, ensure_ascii=ensure_ascii, default=default, escape_slash=escape_slash, flags=flags)
-    return fp.write(ret_str)
+    ret_str = dumps(obj, ensure_ascii=ensure_ascii, default=default, escape_slash=escape_slash, flags=flags)
+    # return fp.write(ret_str)
+    if type(fp) == io.TextIOWrapper:
+        fp.write(ret_str)
+    elif type(fp) == str:
+        if not os.path.exists(fp):
+            raise FileNotFoundError(f"{fp} not found!")
+        with open(fp, 'w') as f:
+            f.write(ret_str)

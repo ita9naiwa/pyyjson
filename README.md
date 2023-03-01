@@ -7,13 +7,14 @@ Yet another Json Parser for Python
 
 
 ### Supports
-it supports standard libraries
-- dump
+it supports standard `json` lib's
 - dumps
-- load
 - loads
+- dump
+- load
 
-functionalities.
+functions
+
 
 ### loads examples
 ```python
@@ -23,10 +24,24 @@ functionalities.
 >>> pyyjson.loads('[{"a":"b"}, 3, 4]')
 [{'a': 'b'}, 3, 4]
 ```
+
 ### dumps example
 ```python
 >>> pyyjson.dumps([{'a': 'b'}, 3, 4])
 '[{"a":"b"},3,4]'
+```
+
+### load example
+```python
+>>> import pyyjson
+>>> pyyjson.load("simple_json.json") # in "tests/" directory
+{'a': 1, 'b': 2, 'c': 3}
+```
+
+### dump example
+```python
+>>> import pyyjson
+>>> pyyjson.dump({'a': 1, 'b': 2, 'c': 3}, "simple_json.json")
 ```
 
 ### Benchmarks
