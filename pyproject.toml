@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyyjson"
+version = "0.1.3"
+authors = [
+    {name = "Hyunsung Lee", email = "ita9naiwa@gmail.com"}
+]
+description="yet another json libs using yyjson"
+readme="README.md"
+requires-python = ">=3.3"
+license = {text = "MIT"}
+classifiers=['Programming Language :: Python :: 3',
+             'License :: OSI Approved :: MIT License']
+# dependencies = []
